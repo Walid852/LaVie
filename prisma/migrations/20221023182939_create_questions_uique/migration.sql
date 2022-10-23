@@ -1,23 +1,18 @@
-/*
-  Warnings:
+-- CreateTable
+CREATE TABLE `Users` (
+    `id` VARCHAR(191) NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `email` VARCHAR(191) NOT NULL,
+    `Password` VARCHAR(191) NOT NULL,
+    `firstName` VARCHAR(191) NOT NULL,
+    `lastName` VARCHAR(191) NOT NULL,
+    `address` VARCHAR(191) NOT NULL,
+    `profilePic` VARCHAR(191) NOT NULL,
+    `points` INTEGER NOT NULL,
 
-  - The primary key for the `users` table will be changed. If it partially fails, the table could be left without primary key constraint.
-  - Added the required column `address` to the `Users` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `points` to the `Users` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `profilePic` to the `Users` table without a default value. This is not possible if the table is not empty.
-  - Made the column `firstName` on table `users` required. This step will fail if there are existing NULL values in that column.
-  - Made the column `lastName` on table `users` required. This step will fail if there are existing NULL values in that column.
-
-*/
--- AlterTable
-ALTER TABLE `users` DROP PRIMARY KEY,
-    ADD COLUMN `address` VARCHAR(191) NOT NULL,
-    ADD COLUMN `points` INTEGER NOT NULL,
-    ADD COLUMN `profilePic` VARCHAR(191) NOT NULL,
-    MODIFY `id` VARCHAR(191) NOT NULL,
-    MODIFY `firstName` VARCHAR(191) NOT NULL,
-    MODIFY `lastName` VARCHAR(191) NOT NULL,
-    ADD PRIMARY KEY (`id`);
+    UNIQUE INDEX `Users_email_key`(`email`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `Blogs` (
@@ -93,28 +88,19 @@ CREATE TABLE `Reply` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Quiz` (
-    `id` VARCHAR(191) NOT NULL,
-    `passingPercentage` INTEGER NOT NULL,
-    `points` INTEGER NOT NULL,
-
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
-CREATE TABLE `UserQuizes` (
-    `quizId` VARCHAR(191) NOT NULL,
+CREATE TABLE `UserQuestions` (
+    `questionId` VARCHAR(191) NOT NULL,
     `userId` VARCHAR(191) NOT NULL,
 
-    PRIMARY KEY (`quizId`, `userId`)
+    PRIMARY KEY (`questionId`, `userId`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `Question` (
     `id` VARCHAR(191) NOT NULL,
     `text` VARCHAR(191) NOT NULL,
-    `quizId` VARCHAR(191) NOT NULL,
 
+    UNIQUE INDEX `Question_text_key`(`text`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -140,9 +126,6 @@ ALTER TABLE `Blogs` ADD CONSTRAINT `Blogs_userId_fkey` FOREIGN KEY (`userId`) RE
 
 -- AddForeignKey
 ALTER TABLE `Notification` ADD CONSTRAINT `Notification_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `Users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `Question` ADD CONSTRAINT `Question_quizId_fkey` FOREIGN KEY (`quizId`) REFERENCES `Quiz`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Option` ADD CONSTRAINT `Option_questionId_fkey` FOREIGN KEY (`questionId`) REFERENCES `Question`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

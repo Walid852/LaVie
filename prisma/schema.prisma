@@ -86,26 +86,16 @@ model Reply {
   date    DateTime @default(now())
 }
 
-model Quiz {
-  id                String @id @default(uuid())
-  passingPercentage Int
-  points            Int
+model UserQuestions {
+  questionId String
+  userId     String
 
-  Question Question[]
-}
-
-model UserQuizes {
-  quizId String
-  userId String
-
-  @@id([quizId, userId])
+  @@id([questionId, userId])
 }
 
 model Question {
   id     String   @id @default(uuid())
-  text   String
-  quizId String
-  quizes Quiz     @relation(fields: [quizId], references: [id])
+  text   String   @unique
   Option Option[]
 }
 
@@ -115,9 +105,10 @@ model Option {
   questionId String
   questions  Question @relation(fields: [questionId], references: [id])
 }
-model Answer{
-  questionId String
-  optionId String
-  @@id([questionId,optionId])
-}
 
+model Answer {
+  questionId String
+  optionId   String
+
+  @@id([questionId, optionId])
+}
