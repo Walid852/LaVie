@@ -4,6 +4,7 @@ import { UsersModule } from './users/users.module';
 import { PrismaService } from './prisma/prisma.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
+import { FacebookStrategy } from './auth/facebook.strategy';
 
 @Module({
   imports: [
