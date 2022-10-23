@@ -5,6 +5,7 @@ import { PrismaService } from './prisma/prisma.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { FacebookStrategy } from './auth/facebook.strategy';
+import { QuizzesModule } from './quizzes/quizzes.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { FacebookStrategy } from './auth/facebook.strategy';
     AuthModule,
     UsersModule,
     PrismaModule,
+    QuizzesModule,
   ],
   providers: [PrismaService],
 })
