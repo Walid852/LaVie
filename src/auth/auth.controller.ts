@@ -28,7 +28,9 @@ export class AuthController {
   }
   @Get('google')
   @UseGuards(AuthGuard('google'))
-  async googleAuth(@Req() req) {}
+  async googleAuth(@Req() req) {
+    return HttpStatus.OK;
+  }
 
   @Get('redirect')
   @UseGuards(AuthGuard('google'))
