@@ -24,6 +24,11 @@ export class AuthService {
         data: {
           email: dto.email,
           Password: hash,
+          firstName: dto.firstName,
+          lastName: dto.lastName,
+          points: 0,
+          address: '',
+          profilePic: '',
         },
       });
 
@@ -54,7 +59,7 @@ export class AuthService {
     return this.signToken(user.id, user.email);
   }
   async signToken(
-    userId: number,
+    userId: string,
     email: string,
   ): Promise<{ access_token: string }> {
     const payload = {
