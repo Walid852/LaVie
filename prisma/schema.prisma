@@ -11,14 +11,113 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid())
   createdAt DateTime @default(now())
 
   email    String @unique
   Password String
 
-  firstName String?
-  lastName  String?
+  firstName    String
+  lastName     String
+  address      String
+  profilePic   String
+  points       Int
+  Blogs        Blogs[]
+  Notification Notification[]
 
   @@map("Users")
 }
+
+model Blogs {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  title     String
+  content   String
+  photoURL  String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Products {
+  id           String @id @default(uuid())
+  name         String
+  price        Int
+  category     String // ask for categories
+  quantity     Int
+  sunlight     Int?
+  temprature   Int?
+  informations String
+  water        Int?
+}
+
+model UserCart {
+  userId    String
+  productId String
+
+  @@id([userId, productId])
+}
+
+model Notification {
+  id     String @id @default(uuid())
+  title  String
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+}
+
+model Post {
+  id      String @id @default(uuid())
+  title   String
+  content String
+  Photo   String
+}
+
+model Like {
+  userId String
+  postId String
+
+  @@id([userId, postId])
+}
+
+model Reply {
+  id      String   @id @default(uuid())
+  userID  String
+  postId  String
+  content String
+  date    DateTime @default(now())
+}
+
+model Quiz {
+  id                String @id @default(uuid())
+  passingPercentage Int
+  points            Int
+
+  Question Question[]
+}
+
+model UserQuizes {
+  quizId String
+  userId String
+
+  @@id([quizId, userId])
+}
+
+model Question {
+  id     String   @id @default(uuid())
+  text   String
+  quizId String
+  quizes Quiz     @relation(fields: [quizId], references: [id])
+  Option Option[]
+}
+
+model Option {
+  id         String   @id @default(uuid())
+  text       String
+  questionId String
+  questions  Question @relation(fields: [questionId], references: [id])
+}
+model Answer{
+  questionId String
+  optionId String
+  @@id([questionId,optionId])
+}
+
