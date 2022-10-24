@@ -6,7 +6,7 @@ import { UpdateQuestionDto } from './dto/update-question.dto';
 export class QuestionService {
   constructor(private prismaService: PrismaService) {}
 
-  // admin role
+  // ADMIN ROLE
   async create(createQuestionDto: CreateQuestionDto) {
     const question = await this.prismaService.question.create({
       data: { text: createQuestionDto.question },
@@ -35,11 +35,56 @@ export class QuestionService {
     return `This action returns a #${id} question`;
   }
 
-  update(id: number, updateQuestionDto: UpdateQuestionDto) {
-    return `This action updates a #${id} question`;
-  }
+  async update(id: string, updateQuestionDto: UpdateQuestionDto) {
+    const updatedQuestion = await this.prismaService.question.update({
+      where: { id: id },
+      data: {
+        text: updateQuestionDto.question,
+      },
+    });
+    const options: any[] = [];
+    const deletedOptions = await this.prismaService.option.deleteMany({
+      where: { questionId: id },
+    });
+    for (const opt of updateQuestionDto.options) {
+      const newOption = await this.prismaService.option.create({
+        data: { questionId: id, text: opt },
+      });
+      options.push(newOption);
+    }
+    const oldAnswer = await this.prismaService.answer.findFirst({
+      where: { questionId: id },
+    });
+    const deletedAnswer = await this.prismaService.answer.delete({
+      where: {
+        questionId_optionId: { questionId: id, optionId: oldAnswer.optionId },
+      },
+    });
+    const updatedAnswer = await this.prismaService.answer.create({
+      data: {
+        questionId: id,
+        optionId: options[0].id,
+      },
+    });
 
-  remove(id: number) {
-    return `This action removes a #${id} question`;
+    return { updatedQuestion, options, updatedAnswer };
+  }
+  // ADMIN ROLE
+  async remove(id: string) {
+    const { optionId } = await this.prismaService.answer.findFirst({
+      where: { questionId: id },
+    });
+    const deletedAnswer = await this.prismaService.answer.deleteMany({
+      where: { questionId: id },
+    });
+
+    console.log('doneeeeee');
+    const deletedOptions = await this.prismaService.option.deleteMany({
+      where: { questionId: id },
+    });
+    const deletedQuestion = await this.prismaService.question.delete({
+      where: { id: id },
+    });
+    return `Qestion deleted successfully`;
   }
 }

@@ -17,7 +17,7 @@ import { JwtGuard } from 'src/auth/guard';
 export class QuestionController {
   constructor(private readonly questionService: QuestionService) {}
 
-  @Post('createquestion')
+  @Post('create')
   create(@Body() createQuestionDto: CreateQuestionDto) {
     return this.questionService.create(createQuestionDto);
   }
@@ -37,11 +37,11 @@ export class QuestionController {
     @Param('id') id: string,
     @Body() updateQuestionDto: UpdateQuestionDto,
   ) {
-    return this.questionService.update(+id, updateQuestionDto);
+    return this.questionService.update(id, updateQuestionDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.questionService.remove(+id);
+    return this.questionService.remove(id);
   }
 }
