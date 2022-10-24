@@ -118,7 +118,8 @@ CREATE TABLE `Answer` (
     `questionId` VARCHAR(191) NOT NULL,
     `optionId` VARCHAR(191) NOT NULL,
 
-    PRIMARY KEY (`questionId`, `optionId`)
+    UNIQUE INDEX `Answer_optionId_key`(`optionId`),
+    PRIMARY KEY (`questionId`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey

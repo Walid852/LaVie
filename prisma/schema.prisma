@@ -107,8 +107,6 @@ model Option {
 }
 
 model Answer {
-  questionId String
-  optionId   String
-
-  @@id([questionId, optionId])
+  questionId String @id
+  optionId   String @unique
 }

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateQuestionDto } from './dto/create-question.dto';
 import { UpdateQuestionDto } from './dto/update-question.dto';
+
 @Injectable()
 export class QuestionService {
   constructor(private prismaService: PrismaService) {}
@@ -11,7 +12,6 @@ export class QuestionService {
     const question = await this.prismaService.question.create({
       data: { text: createQuestionDto.question },
     });
-    console.log(createQuestionDto.options);
     const options: { text: string; questionId: string; id: string }[] = [];
     for (const opt of createQuestionDto.options) {
       const createdOption = await this.prismaService.option.create({
@@ -26,13 +26,36 @@ export class QuestionService {
     });
     return { question, options, answer };
   }
-
-  findAll() {
-    return `This action returns all question`;
+  // ADMIN ROLE
+  async findAll(page: number) {
+    //pagination
+    if (!page) page = 1;
+    const limit = 20;
+    const skip = (page - 1) * limit;
+    const questions = await this.prismaService.question.findMany({
+      skip: skip,
+      take: limit,
+    });
+    const questionsAndOptions: any[] = [];
+    for (const question of questions) {
+      const options = await this.prismaService.option.findMany({
+        where: { questionId: question.id },
+        select: { text: true, id: true },
+      });
+      questionsAndOptions.push({ question, options });
+    }
+    return { questionsAndOptions };
   }
-
-  findOne(id: number) {
-    return `This action returns a #${id} question`;
+  // ADMIN ROLE
+  async findOne(id: string) {
+    const question = await this.prismaService.question.findUnique({
+      where: { id: id },
+    });
+    const options = await this.prismaService.option.findMany({
+      where: { questionId: id },
+      select: { text: true, id: true },
+    });
+    return { question, options };
   }
 
   async update(id: string, updateQuestionDto: UpdateQuestionDto) {
@@ -55,14 +78,9 @@ export class QuestionService {
     const oldAnswer = await this.prismaService.answer.findFirst({
       where: { questionId: id },
     });
-    const deletedAnswer = await this.prismaService.answer.delete({
-      where: {
-        questionId_optionId: { questionId: id, optionId: oldAnswer.optionId },
-      },
-    });
-    const updatedAnswer = await this.prismaService.answer.create({
+    const updatedAnswer = await this.prismaService.answer.update({
+      where: { questionId: id },
       data: {
-        questionId: id,
         optionId: options[0].id,
       },
     });
@@ -71,14 +89,9 @@ export class QuestionService {
   }
   // ADMIN ROLE
   async remove(id: string) {
-    const { optionId } = await this.prismaService.answer.findFirst({
+    const deletedAnswer = await this.prismaService.answer.delete({
       where: { questionId: id },
     });
-    const deletedAnswer = await this.prismaService.answer.deleteMany({
-      where: { questionId: id },
-    });
-
-    console.log('doneeeeee');
     const deletedOptions = await this.prismaService.option.deleteMany({
       where: { questionId: id },
     });
