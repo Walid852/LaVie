@@ -11,8 +11,7 @@ export class ProductService {
       data: {
         name: createProductDto.name,
         price: +createProductDto.price,
-        superCategory: createProductDto.superCategory,
-        subCategory: createProductDto.subCategory,
+        category: createProductDto.superCategory,
         quantity: +createProductDto.quantity,
         sunlight: createProductDto.sunlight ? +createProductDto.sunlight : null,
         temprature: createProductDto.temprature
@@ -22,12 +21,22 @@ export class ProductService {
         informations: createProductDto.information,
       },
     });
+    const upsertUser = await this.prismaService.subCategory.upsert({
+      where: {
+        name: createProductDto.subCategory,
+      },
+      update: {
+        name: createProductDto.subCategory,
+      },
+      create: {
+        name: createProductDto.subCategory,
+        
+      },
+    });
     return { newProduct };
   }
   // ask about filters
-  async findAll(query: any) {
-    return `This action returns all product`;
-  }
+  async findAll(query: any) {}
 
   async findOne(id: string) {
     const product = await this.prismaService.products.findFirst({
