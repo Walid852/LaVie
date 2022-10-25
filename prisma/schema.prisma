@@ -39,15 +39,17 @@ model Blogs {
 }
 
 model Products {
-  id           String @id @default(uuid())
-  name         String
-  price        Int
-  category     String // ask for categories
-  quantity     Int
-  sunlight     Int?
-  temprature   Int?
-  informations String
-  water        Int?
+  id            String @id @default(uuid())
+  name          String
+  price         Int
+  superCategory String
+  subCategory   String
+  quantity      Int
+  sunlight      Int?
+  temprature    Int?
+  informations  String
+  water         Int?
+  paidAmount    Int    @default(0)
 }
 
 model UserCart {
