@@ -32,7 +32,6 @@ export class AuthController {
     return HttpStatus.OK;
   }
 
-
   @Get('redirect')
   @UseGuards(AuthGuard('google'))
   googleAuthRedirect(@Req() req) {
