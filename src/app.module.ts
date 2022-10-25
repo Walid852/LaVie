@@ -9,7 +9,6 @@ import { QuestionModule } from './question/question.module';
 import { QuizService } from './quiz/quiz.service';
 import { QuizController } from './quiz/quiz.controller';
 import { QuizModule } from './quiz/quiz.module';
-import { ProductModule } from './product/product.module';
 
 @Module({
   imports: [
@@ -21,7 +20,6 @@ import { ProductModule } from './product/product.module';
     PrismaModule,
     QuestionModule,
     QuizModule,
-    ProductModule,
   ],
   providers: [PrismaService, QuizService],
   controllers: [QuizController],

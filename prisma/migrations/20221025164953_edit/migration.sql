@@ -31,13 +31,14 @@ CREATE TABLE `Products` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
     `price` INTEGER NOT NULL,
-    `category` ENUM('PLANTS', 'SEEDS', 'TOOLS') NOT NULL,
+    `superCategory` VARCHAR(191) NOT NULL,
+    `subCategory` VARCHAR(191) NOT NULL,
     `quantity` INTEGER NOT NULL,
     `sunlight` INTEGER NULL,
     `temprature` INTEGER NULL,
     `informations` VARCHAR(191) NOT NULL,
     `water` INTEGER NULL,
-    `paidAmount` INTEGER NOT NULL DEFAULT 0,
+    `soldAmount` INTEGER NOT NULL DEFAULT 0,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -121,16 +122,6 @@ CREATE TABLE `Answer` (
 
     UNIQUE INDEX `Answer_optionId_key`(`optionId`),
     PRIMARY KEY (`questionId`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
-CREATE TABLE `SubCategory` (
-    `superCat` ENUM('PLANTS', 'SEEDS', 'TOOLS') NOT NULL,
-    `id` VARCHAR(191) NOT NULL,
-    `name` VARCHAR(191) NOT NULL,
-
-    UNIQUE INDEX `SubCategory_name_key`(`name`),
-    PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey

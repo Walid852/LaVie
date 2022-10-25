@@ -11,7 +11,7 @@ export class ProductService {
       data: {
         name: createProductDto.name,
         price: +createProductDto.price,
-        category: createProductDto.superCategory,
+        category: createProductDto.sup,
         quantity: +createProductDto.quantity,
         sunlight: createProductDto.sunlight ? +createProductDto.sunlight : null,
         temprature: createProductDto.temprature
