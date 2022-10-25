@@ -4,7 +4,11 @@ import { UsersModule } from './users/users.module';
 import { PrismaService } from './prisma/prisma.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
-import { FacebookStrategy } from './auth/facebook.strategy';
+import { BlogsModule } from './blogs/blogs.module';
+import { PostsModule } from './posts/posts.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { LikesModule } from './likes/likes.module';
+import { RepliesModule } from './replies/replies.module';
 
 @Module({
   imports: [
@@ -14,6 +18,11 @@ import { FacebookStrategy } from './auth/facebook.strategy';
     AuthModule,
     UsersModule,
     PrismaModule,
+    BlogsModule,
+    PostsModule,
+    NotificationsModule,
+    LikesModule,
+    RepliesModule,
   ],
   providers: [PrismaService],
 })

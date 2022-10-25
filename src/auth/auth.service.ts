@@ -16,9 +16,7 @@ export class AuthService {
   ) {}
 
   async signup(dto: AuthDto) {
-    // generate the password hash
     const hash = await argon.hash(dto.password);
-    // save the new user in the db
     try {
       const user = await this.prisma.user.create({
         data: {
@@ -43,18 +41,14 @@ export class AuthService {
     }
   }
   async signin(dto: AuthDto) {
-    // find the user by email
     const user = await this.prisma.user.findUnique({
       where: {
         email: dto.email,
       },
     });
-    // if user does not exist throw exception
     if (!user) throw new ForbiddenException('Credentials incorrect');
     console.log('signin');
-    // compare password
     const pwMatches = await argon.verify(user.Password, dto.password);
-    // if password incorrect throw exception
     if (!pwMatches) throw new ForbiddenException('Credentials incorrect');
     return this.signToken(user.id, user.email);
   }
@@ -69,7 +63,7 @@ export class AuthService {
     const secret = this.config.get('JWT_SECRET');
 
     const token = await this.jwt.signAsync(payload, {
-      expiresIn: '15m',
+      expiresIn: '35m',
       secret: secret,
     });
 
