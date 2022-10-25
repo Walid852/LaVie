@@ -103,26 +103,17 @@ model Reply {
   post    Post     @relation(fields: [postId], references: [id])
 }
 
-model Quiz {
-  id                String @id @default(uuid())
-  passingPercentage Int
-  points            Int
+model UserQuestions {
+  questionId String
+  userId     String
 
-  Question Question[]
-}
-
-model UserQuizes {
-  quizId String
-  userId String
-
-  @@id([quizId, userId])
+  @@id([questionId, userId])
 }
 
 model Question {
   id     String   @id @default(uuid())
   text   String
   quizId String
-  quizes Quiz     @relation(fields: [quizId], references: [id])
   Option Option[]
 }
 
