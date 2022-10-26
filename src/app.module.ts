@@ -11,11 +11,15 @@ import { QuizController } from './quiz/quiz.controller';
 import { QuizModule } from './quiz/quiz.module';
 import { ProductModule } from './product/product.module';
 import { FiltersModule } from './filters/filters.module';
+
+import { CartModule } from './cart/cart.module';
+
 import { BlogsModule } from './blogs/blogs.module';
 import { PostsModule } from './posts/posts.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { LikesModule } from './likes/likes.module';
 import { RepliesModule } from './replies/replies.module';
+
 
 
 
@@ -31,6 +35,9 @@ import { RepliesModule } from './replies/replies.module';
     QuizModule,
     ProductModule,
     FiltersModule,
+
+    CartModule,
+
 
     BlogsModule,
     PostsModule,

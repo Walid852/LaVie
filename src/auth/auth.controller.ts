@@ -64,7 +64,7 @@ export class AuthController {
   async facebookLogin(): Promise<any> {
     return HttpStatus.OK;
   }
-  @Get('facebook/redirect')
+  @Get('facebook/token')
   @UseGuards(AuthGuard('facebook'))
   async facebookLoginRedirect(@Req() req): Promise<any> {
     return {
