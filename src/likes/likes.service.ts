@@ -1,19 +1,38 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { CreateNotificationDto } from 'src/notifications/dto/create-notification.dto';
+import { NotificationsService } from 'src/notifications/notifications.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateLikeDto } from './dto/create-like.dto';
 import { UpdateLikeDto } from './dto/update-like.dto';
 
 @Injectable()
 export class LikesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notify: NotificationsService,
+  ) {}
   async create(createLikeDto: CreateLikeDto) {
-    const like = await this.prisma.like.create({
-      data: {
-        userId: createLikeDto.userId,
-        postId: createLikeDto.postId,
-      },
-    });
-    return like;
+    try {
+      const like = await this.prisma.like.create({
+        data: {
+          userId: createLikeDto.userId,
+          postId: createLikeDto.postId,
+        },
+      });
+
+      const createnotificationdto: CreateNotificationDto = {
+        title: `${like.userId} Add like to post will create blog `,
+        typeofNotification: `Add like `,
+        typeId: like.postId,
+        userId: like.userId,
+        Seen: false,
+      };
+      this.notify.create(createnotificationdto);
+      return like;
+    } catch (error) {
+      console.log(error);
+      throw new BadRequestException(error);
+    }
   }
 
   async findAll() {
@@ -41,14 +60,18 @@ export class LikesService {
     });
   }
   async remove(updateLikeDto: UpdateLikeDto) {
-    await this.prisma.like.delete({
-      where: {
-        userId_postId: {
-          postId: updateLikeDto.postId,
-          userId: updateLikeDto.userId,
+    try {
+      await this.prisma.like.delete({
+        where: {
+          userId_postId: {
+            postId: updateLikeDto.postId,
+            userId: updateLikeDto.userId,
+          },
         },
-      },
-    });
-    return `delete like from post ${updateLikeDto.postId}`;
+      });
+      return `delete like from post ${updateLikeDto.postId}`;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
   }
 }

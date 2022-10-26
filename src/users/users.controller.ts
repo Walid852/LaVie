@@ -11,9 +11,10 @@ import {
   UseInterceptors,
   UploadedFile,
   Res,
+  BadRequestException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto, FileUploadDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtGuard } from 'src/auth/guard';
 import { Roles } from 'src/enums/roles.decorator';
@@ -26,6 +27,14 @@ import path = require('path');
 import { join } from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { diskStorage } from 'multer';
+import {
+  ApiAcceptedResponse,
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiTags,
+} from '@nestjs/swagger';
+import { Userentity } from './entities/user.entity';
 
 export const storage = {
   storage: diskStorage({
@@ -39,59 +48,78 @@ export const storage = {
     },
   }),
 };
+
+@ApiTags('users')
+@ApiBearerAuth()
 @UseGuards(JwtGuard)
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
+  /*@Post()
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
-  }
+  }*/
 
   @Get()
   @UseGuards(JwtGuard, RolesGuard)
+  @ApiAcceptedResponse({
+    description: 'Find all users',
+    type: CreateUserDto,
+    isArray: true,
+  })
   //@Roles(Role.User)
   findAll(@Request() req) {
     const user: User = req.user;
     console.log(user);
     return this.usersService.findAll();
   }
-
+  @ApiAcceptedResponse({
+    description: 'Find spesific User.',
+    type: UpdateUserDto,
+    isArray: true,
+  })
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(id);
   }
 
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateUserDto: UpdateUserDto,
-    @Request() req,
-  ) {
-    console.log(id);
+  @Patch()
+  @ApiAcceptedResponse({
+    description: 'Update current user',
+    type: UpdateUserDto,
+    isArray: true,
+  })
+  update(@Body() updateUserDto: UpdateUserDto, @Request() req) {
     const user: User = req.user;
-    updateUserDto.email = user.email;
     updateUserDto.points = user.points;
-    return this.usersService.update(id, updateUserDto);
+    if (updateUserDto.password == null) updateUserDto.password = user.Password;
+    console.log(updateUserDto);
+    return this.usersService.update(user.id, updateUserDto);
   }
-  @UseGuards(JwtGuard)
+
   @Post('uploadImage')
   @UseInterceptors(FileInterceptor('file', storage))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'List of cats',
+    type: FileUploadDto,
+  })
+  @ApiAcceptedResponse({
+    description: 'Update current user',
+    type: UpdateUserDto,
+    isArray: true,
+  })
   uploadFile(@UploadedFile() file, @Request() req): Promise<UpdateUserDto> {
     const user: User = req.user;
 
     return this.usersService.updatePhoto(user.id, file.path);
   }
-  @Get('profile-image/:imagename')
-  findProfileImage(
-    @Param('imagename') imagename,
-    @Res() res,
-  ): Observable<object> {
-    return of(
-      res.sendFile(join(process.cwd(), 'uploads/profileimages/' + imagename)),
-    );
-  }
+
+  @ApiAcceptedResponse({
+    description: 'delete spesific User.',
+    type: String,
+  })
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usersService.remove(id);

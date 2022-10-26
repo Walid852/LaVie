@@ -1,7 +1,11 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { AuthDto } from './dto';
+import { AuthDto, AuthDtoSignIn, DataResponse } from './dto';
 import * as argon from 'argon2';
 
 import { JwtService } from '@nestjs/jwt';
@@ -28,19 +32,33 @@ export class AuthService {
           address: '',
           profilePic: '',
         },
+        select: {
+          id: true,
+          email: true,
+          firstName: true,
+          lastName: true,
+          points: true,
+          profilePic: true,
+          address: true,
+          createdAt: true,
+        },
       });
-
-      return this.signToken(user.id, user.email);
+      console.log(user);
+      const res: DataResponse = {
+        accessToken: (await this.signToken(user.id, user.email)).access_token,
+        user: user,
+      };
+      return res;
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
           throw new ForbiddenException('Credentials taken');
         }
       }
-      throw error;
+      throw new BadRequestException('missing');
     }
   }
-  async signin(dto: AuthDto) {
+  async signin(dto: AuthDtoSignIn) {
     const user = await this.prisma.user.findUnique({
       where: {
         email: dto.email,
