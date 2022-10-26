@@ -11,6 +11,7 @@ import { QuizController } from './quiz/quiz.controller';
 import { QuizModule } from './quiz/quiz.module';
 import { ProductModule } from './product/product.module';
 import { FiltersModule } from './filters/filters.module';
+import { CartModule } from './cart/cart.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { FiltersModule } from './filters/filters.module';
     QuizModule,
     ProductModule,
     FiltersModule,
+    CartModule,
   ],
   providers: [PrismaService, QuizService],
   controllers: [QuizController],

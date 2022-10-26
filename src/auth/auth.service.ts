@@ -51,7 +51,6 @@ export class AuthService {
     });
     // if user does not exist throw exception
     if (!user) throw new ForbiddenException('Credentials incorrect');
-    console.log('signin');
     // compare password
     const pwMatches = await argon.verify(user.Password, dto.password);
     // if password incorrect throw exception
