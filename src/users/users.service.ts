@@ -1,4 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
@@ -7,7 +12,7 @@ import * as argon from 'argon2';
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
-  async create(createUserDto: CreateUserDto) {
+  /*async create(createUserDto: CreateUserDto) {
     const hash = await argon.hash(createUserDto.password);
     // save the new user in the db
     const user = await this.prisma.user.create({
@@ -22,7 +27,7 @@ export class UsersService {
       },
     });
     return user;
-  }
+  }*/
 
   async findAll() {
     const users = await this.prisma.user.findMany({
@@ -39,7 +44,7 @@ export class UsersService {
   }
 
   async findOne(id: string) {
-    const user = await this.prisma.user.findMany({
+    const user = await this.prisma.user.findUnique({
       where: {
         id: id,
       },
@@ -52,11 +57,24 @@ export class UsersService {
         points: true,
       },
     });
+    if (!user) throw new BadRequestException();
     return user;
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
-    const hash = await argon.hash(updateUserDto.password.toString());
+    let hash;
+    if (updateUserDto.password != undefined) {
+      hash = await argon.hash(updateUserDto.password.toString());
+    }
+    const currentUser = this.findOne(id);
+    if ((await currentUser).email != updateUserDto.email) {
+      const temp = this.prisma.user.findUnique({
+        where: { email: updateUserDto.email },
+      });
+      if (temp) {
+        throw new BadRequestException('email founded');
+      }
+    }
     const user = await this.prisma.user.update({
       where: {
         id: id,
@@ -107,6 +125,6 @@ export class UsersService {
         id: id,
       },
     });
-    return user;
+    return `delete user ${id}`;
   }
 }

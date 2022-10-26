@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { UpdateNotificationDto } from './dto/update-notification.dto';
@@ -32,29 +32,40 @@ export class NotificationsService {
         id: id,
       },
     });
+    if (!notification) {
+      throw new BadRequestException();
+    }
     return notification;
   }
 
   async update(id: string, updateNotificationDto: UpdateNotificationDto) {
-    const notify = await this.prisma.notification.update({
-      where: {
-        id: id,
-      },
-      data: {
-        title: updateNotificationDto.title,
-        typeofNotification: updateNotificationDto.typeofNotification,
-        typeId: updateNotificationDto.typeId,
-      },
-    });
-    return notify;
+    try {
+      const notify = await this.prisma.notification.update({
+        where: {
+          id: id,
+        },
+        data: {
+          title: updateNotificationDto.title,
+          typeofNotification: updateNotificationDto.typeofNotification,
+          typeId: updateNotificationDto.typeId,
+        },
+      });
+      return notify;
+    } catch (error) {
+      throw new BadRequestException('wrong id');
+    }
   }
 
   async remove(id: string) {
-    const notify = await this.prisma.notification.delete({
-      where: {
-        id: id,
-      },
-    });
-    return `This action removes a #${notify.id} notification`;
+    try {
+      const notify = await this.prisma.notification.delete({
+        where: {
+          id: id,
+        },
+      });
+      return `This action removes a #${notify.id} notification`;
+    } catch (error) {
+      throw new BadRequestException('wrong id ');
+    }
   }
 }

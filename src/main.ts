@@ -11,7 +11,9 @@ async function bootstrap() {
     .setDescription('La Vie API description')
     .setVersion('1.0')
     .addTag('LaVie')
+    .addBearerAuth()
     .build();
+
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('Api', app, document);
   await app.listen(3000);
