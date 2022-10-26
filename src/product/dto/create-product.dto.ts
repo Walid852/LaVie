@@ -4,8 +4,10 @@ export class CreateProductDto {
   @IsString()
   name;
   @IsNotEmpty()
+  @IsString()
   superCategory;
   @IsNotEmpty()
+  @IsString()
   subCategory;
   @IsNotEmpty()
   price;

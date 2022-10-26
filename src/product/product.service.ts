@@ -11,7 +11,8 @@ export class ProductService {
       data: {
         name: createProductDto.name,
         price: +createProductDto.price,
-        category: createProductDto.sup,
+        superCategory: createProductDto.superCategory,
+        subCategory: createProductDto.subCategory,
         quantity: +createProductDto.quantity,
         sunlight: createProductDto.sunlight ? +createProductDto.sunlight : null,
         temprature: createProductDto.temprature
@@ -21,23 +22,34 @@ export class ProductService {
         informations: createProductDto.information,
       },
     });
-    const upsertUser = await this.prismaService.subCategory.upsert({
-      where: {
-        name: createProductDto.subCategory,
-      },
-      update: {
-        name: createProductDto.subCategory,
-      },
-      create: {
-        name: createProductDto.subCategory,
-        
-      },
-    });
     return { newProduct };
   }
   // ask about filters
-  async findAll(query: any) {}
+  async findAll(query: any) {
+    const superFilter = query.supF;
+    const subFilter = query.subF;
+    console.log(query.supF);
 
+    return 'f';
+  }
+  allproducts = async function (...subFilters: string[], page: number) {
+    const allproductsFilters: string[] = [];
+    const subFiltersArray: string[] = [];
+    subFilters.forEach((elem, i) => {
+      // guard class for undefineds
+      if (!elem) return { error: "filters doesn't exist" };
+      if (elem.includes('all')) {
+        elem.replace('all ', '');
+        allproductsFilters.push(elem);
+      } else {
+        subFiltersArray.push(elem);
+      }
+    });
+    if (!page) page = 1;
+    const limit = 10;
+    const skip = (page - 1) * limit;
+    const products1=await this.prismaService.products.fin;
+  };
   async findOne(id: string) {
     const product = await this.prismaService.products.findFirst({
       where: { id: id },
@@ -46,8 +58,21 @@ export class ProductService {
   }
   //ADMIN ROLE
   // ask for data should be updated
-  update(id: string, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
+  async update(id: string, updateProductDto: UpdateProductDto) {
+    const updatedProduct = await this.prismaService.products.update({
+      where: { id: id },
+      data: {
+        name: updateProductDto.name,
+        price: updateProductDto.price,
+        superCategory: updateProductDto.superCategory,
+        quantity: updateProductDto.quantity,
+        sunlight: updateProductDto.sunlight,
+        temprature: updateProductDto.temprature,
+        informations: updateProductDto.information,
+        water: updateProductDto.water,
+      },
+    });
+    return updatedProduct;
   }
 
   async remove(id: string) {
