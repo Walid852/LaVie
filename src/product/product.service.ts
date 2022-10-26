@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { limits } from 'argon2';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -24,32 +25,88 @@ export class ProductService {
     });
     return { newProduct };
   }
-  // ask about filters
+
   async findAll(query: any) {
     const superFilter = query.supF;
     const subFilter = query.subF;
-    console.log(query.supF);
-
-    return 'f';
+    let page = +query.p;
+    if (!page) page = 1;
+    const limit = 10;
+    const skip = (page - 1) * limit;
+    if (!superFilter && !subFilter) {
+      return this.allProducts(limit, skip);
+    }
+    if (superFilter?.includes('all')) {
+      return this.allProductsFilter(subFilter, limit, skip);
+    } else {
+      if (subFilter?.includes('all') || !subFilter) {
+        return await this.prismaService.products.findMany({
+          where: { superCategory: superFilter },
+          take: limit,
+          skip: skip,
+        });
+      } else {
+        return this.filters(superFilter, subFilter, limit, skip);
+      }
+    }
   }
-  allproducts = async function (...subFilters: string[], page: number) {
-    const allproductsFilters: string[] = [];
+  async allProducts(limit: number, skip: number) {
+    const plants = await this.prismaService.products.findMany({
+      where: { superCategory: 'plants' },
+      take: Math.floor(limit / 3),
+      skip: Math.floor(skip / 3),
+    });
+    const seeds = await this.prismaService.products.findMany({
+      where: { superCategory: 'seeds' },
+      take: Math.floor(limit / 3),
+      skip: Math.floor(skip / 3),
+    });
+    const tools = await this.prismaService.products.findMany({
+      where: { superCategory: 'tools' },
+      take: Math.ceil(limit / 3),
+      skip: Math.ceil(skip / 3),
+    });
+    return { plants, seeds, tools };
+  }
+  async filters(
+    superFilters: string,
+    subFiltes: string,
+    limit: number,
+    skip: number,
+  ) {
+    if (!subFiltes) return { error: "filters doesn't exist" };
+    const products = await this.prismaService.products.findMany({
+      where: { superCategory: superFilters, subCategory: subFiltes },
+      take: limit,
+      skip: skip,
+    });
+    return products;
+  }
+  async allProductsFilter(subFilters: string[], limit: number, skip: number) {
+    const superCatFilters: string[] = [];
     const subFiltersArray: string[] = [];
-    subFilters.forEach((elem, i) => {
+    subFilters.forEach((elem) => {
       // guard class for undefineds
       if (!elem) return { error: "filters doesn't exist" };
       if (elem.includes('all')) {
         elem.replace('all ', '');
-        allproductsFilters.push(elem);
+        superCatFilters.push(elem);
       } else {
         subFiltersArray.push(elem);
       }
     });
-    if (!page) page = 1;
-    const limit = 10;
-    const skip = (page - 1) * limit;
-    const products1=await this.prismaService.products.fin;
-  };
+    const superCatProducts = await this.prismaService.products.findMany({
+      where: { superCategory: { in: superCatFilters } },
+      take: limit,
+      skip: skip,
+    });
+    const subCatProducts = await this.prismaService.products.findMany({
+      where: { subCategory: { in: subFiltersArray } },
+      take: limit,
+      skip: skip,
+    });
+    return { superCatProducts, subCatProducts };
+  }
   async findOne(id: string) {
     const product = await this.prismaService.products.findFirst({
       where: { id: id },
@@ -81,4 +138,5 @@ export class ProductService {
     });
     return { message: 'product deleted successfully', deletedProduct };
   }
+  
 }
