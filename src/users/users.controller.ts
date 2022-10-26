@@ -7,42 +7,121 @@ import {
   Param,
   Delete,
   UseGuards,
-  HttpStatus,
   Request,
-  Req,
+  UseInterceptors,
+  UploadedFile,
+  Res,
+  BadRequestException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto, FileUploadDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtGuard } from 'src/auth/guard';
-import { AuthGuard } from '@nestjs/passport';
+import { Roles } from 'src/enums/roles.decorator';
+import { Role } from 'src/enums/role.enum';
+import { RolesGuard } from 'src/enums/roles.guard';
+import { User } from '@prisma/client';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Observable, of } from 'rxjs';
+import path = require('path');
+import { join } from 'path';
+import { v4 as uuidv4 } from 'uuid';
+import { diskStorage } from 'multer';
+import {
+  ApiAcceptedResponse,
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiTags,
+} from '@nestjs/swagger';
+import { Userentity } from './entities/user.entity';
+
+export const storage = {
+  storage: diskStorage({
+    destination: './uploads/profileimages',
+    filename: (req, file, cb) => {
+      const filename: string =
+        path.parse(file.originalname).name.replace(/\s/g, '') + uuidv4();
+      const extension: string = path.parse(file.originalname).ext;
+
+      cb(null, `${filename}${extension}`);
+    },
+  }),
+};
+
+@ApiTags('users')
+@ApiBearerAuth()
 @UseGuards(JwtGuard)
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
+  /*@Post()
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
-  }
- 
+  }*/
+
   @Get()
-  findAll() {
+  @UseGuards(JwtGuard, RolesGuard)
+  @ApiAcceptedResponse({
+    description: 'Find all users',
+    type: CreateUserDto,
+    isArray: true,
+  })
+  //@Roles(Role.User)
+  findAll(@Request() req) {
+    const user: User = req.user;
+    console.log(user);
     return this.usersService.findAll();
   }
-
+  @ApiAcceptedResponse({
+    description: 'Find spesific User.',
+    type: UpdateUserDto,
+    isArray: true,
+  })
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+    return this.usersService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  @Patch()
+  @ApiAcceptedResponse({
+    description: 'Update current user',
+    type: UpdateUserDto,
+    isArray: true,
+  })
+  update(@Body() updateUserDto: UpdateUserDto, @Request() req) {
+    const user: User = req.user;
+    updateUserDto.points = user.points;
+    if (updateUserDto.password == null) updateUserDto.password = user.Password;
+    console.log(updateUserDto);
+    return this.usersService.update(user.id, updateUserDto);
   }
 
+  @Post('uploadImage')
+  @UseInterceptors(FileInterceptor('file', storage))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'List of cats',
+    type: FileUploadDto,
+  })
+  @ApiAcceptedResponse({
+    description: 'Update current user',
+    type: UpdateUserDto,
+    isArray: true,
+  })
+  uploadFile(@UploadedFile() file, @Request() req): Promise<UpdateUserDto> {
+    const user: User = req.user;
+
+    return this.usersService.updatePhoto(user.id, file.path);
+  }
+
+  @ApiAcceptedResponse({
+    description: 'delete spesific User.',
+    type: String,
+  })
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+    return this.usersService.remove(id);
   }
 }

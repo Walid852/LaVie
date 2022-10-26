@@ -24,6 +24,9 @@ model User {
   points       Int
   Blogs        Blogs[]
   Notification Notification[]
+  Post         Post[]
+  Reply        Reply[]
+  Like         Like[]
 
   @@map("Users")
 }
@@ -60,10 +63,14 @@ model UserCart {
 }
 
 model Notification {
-  id     String @id @default(uuid())
-  title  String
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
+  id                 String   @id @default(uuid())
+  title              String
+  createdAt          DateTime @default(now())
+  Seen               Boolean  @default(false)
+  userId             String
+  typeofNotification String?
+  typeId             String?
+  user               User     @relation(fields: [userId], references: [id])
 }
 
 model Post {
@@ -71,11 +78,19 @@ model Post {
   title   String
   content String
   Photo   String
+
+  userId String
+  user   User    @relation(fields: [userId], references: [id])
+  Like   Like[]
+  Reply  Reply[]
 }
 
 model Like {
   userId String
   postId String
+
+  user User @relation(fields: [userId], references: [id])
+  post Post @relation(fields: [postId], references: [id])
 
   @@id([userId, postId])
 }
@@ -86,6 +101,8 @@ model Reply {
   postId  String
   content String
   date    DateTime @default(now())
+  user    User     @relation(fields: [userID], references: [id])
+  post    Post     @relation(fields: [postId], references: [id])
 }
 
 model UserQuestions {
