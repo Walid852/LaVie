@@ -11,6 +11,7 @@ export class ProductService {
     const newProduct = await this.prismaService.products.create({
       data: {
         name: createProductDto.name,
+        photo: createProductDto.photoUrl,
         price: +createProductDto.price,
         superCategory: createProductDto.superCategory,
         subCategory: createProductDto.subCategory,
@@ -113,8 +114,7 @@ export class ProductService {
     });
     return product;
   }
-  //ADMIN ROLE
-  // ask for data should be updated
+
   async update(id: string, updateProductDto: UpdateProductDto) {
     const updatedProduct = await this.prismaService.products.update({
       where: { id: id },
@@ -127,6 +127,7 @@ export class ProductService {
         temprature: updateProductDto.temprature,
         informations: updateProductDto.information,
         water: updateProductDto.water,
+        photo: updateProductDto.photoUrl,
       },
     });
     return updatedProduct;
@@ -138,5 +139,11 @@ export class ProductService {
     });
     return { message: 'product deleted successfully', deletedProduct };
   }
-  
+  async updatePhoto(productId, updateProductdto) {
+    const updatedProduct = await this.prismaService.products.update({
+      where: { id: productId },
+      data: { photo: updateProductdto.photoUrl },
+    });
+    return { updatedProduct };
+  }
 }

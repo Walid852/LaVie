@@ -24,7 +24,7 @@ export class FiltersService {
       };
       categories.push(categObject);
     }
-    return categories;
+    return { categories: categories };
   }
   async getBestSelling(page: number) {
     if (!page) page = 1;
@@ -35,6 +35,6 @@ export class FiltersService {
       take: limit,
       skip: skip,
     });
-    return bestSelling;
+    return { bestselling: bestSelling };
   }
 }

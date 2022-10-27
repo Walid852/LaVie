@@ -24,7 +24,7 @@ export class QuestionService {
     const answer = await this.prismaService.answer.create({
       data: { questionId: question.id, optionId: options[0].id },
     });
-    return { question, options, answer };
+    return { question, options, answer: createQuestionDto.options[0] };
   }
   // ADMIN ROLE
   async findAll(page: number) {
@@ -85,7 +85,11 @@ export class QuestionService {
       },
     });
 
-    return { updatedQuestion, options, updatedAnswer };
+    return {
+      updatedQuestion,
+      options,
+      updatedAnswer: updateQuestionDto.options[0],
+    };
   }
   // ADMIN ROLE
   async remove(id: string) {
@@ -98,6 +102,6 @@ export class QuestionService {
     const deletedQuestion = await this.prismaService.question.delete({
       where: { id: id },
     });
-    return `Qestion deleted successfully`;
+    return { message: `Qestion deleted successfully` };
   }
 }
