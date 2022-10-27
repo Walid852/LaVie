@@ -6,10 +6,17 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class CartService {
   constructor(private prismaService: PrismaService) {}
   async findAll(id: string) {
-    const products = await this.prismaService.userCart.findMany({
+    const productsIds = await this.prismaService.userCart.findMany({
       where: { userId: id },
     });
-    return products;
+    const products: any[] = [];
+    for (const prod of productsIds) {
+      const product = await this.prismaService.products.findUnique({
+        where: { id: prod.productId },
+      });
+      products.push(product);
+    }
+    return { products };
   }
 
   async add(userId: string, productId: string) {
@@ -23,6 +30,6 @@ export class CartService {
     const removedProduct = await this.prismaService.userCart.delete({
       where: { userId_productId: { userId: userId, productId: id } },
     });
-    return removedProduct;
+    return { message: 'Product removed from cart' };
   }
 }
