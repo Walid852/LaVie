@@ -120,11 +120,102 @@ export class UsersService {
   }
 
   async remove(id: string) {
-    const user = await this.prisma.user.delete({
+    /*try {
+
+      await this.prisma.notification.deleteMany({
+        where: {
+          userId: id,
+        },
+      });
+      const posts = await this.prisma.post.findMany({
+        where: {
+          userId: id,
+        },
+      });
+      console.log(posts);
+
+      const reply = this.prisma.reply.deleteMany({
+        where: {
+          postId: '82598a31-5e0d-4cd1-953f-b805e1ceb88a',
+        },
+      });
+      const like = this.prisma.like.deleteMany({
+        where: {
+          postId: '82598a31-5e0d-4cd1-953f-b805e1ceb88a',
+        },
+      });
+      console.log(reply);
+      console.log(like);
+
+      console.log(1);
+      await this.prisma.like.deleteMany({
+        where: {
+          userId: id,
+        },
+      });
+      console.log(2);
+      await this.prisma.reply.deleteMany({
+        where: {
+          userID: id,
+        },
+      });
+      console.log(3);
+
+      await this.prisma.post.deleteMany({
+        where: {
+          userId: id,
+        },
+      });
+      console.log(5);
+      await this.prisma.blogs.deleteMany({
+        where: {
+          userId: id,
+        },
+      });
+      console.log(6);
+      await this.prisma.user.delete({
+        where: {
+          id: id,
+        },
+      });
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+    return `delete user ${id} and all activities `;
+  }*/
+    const update = await this.prisma.user.update({
       where: {
         id: id,
       },
+      data: {
+        Notification: {
+          deleteMany: {
+            userId: id,
+          },
+        },
+        Blogs: {
+          deleteMany: {
+            userId: id,
+          },
+        },
+        Reply: {
+          deleteMany: {
+            userID: id,
+          },
+        },
+        Like: {
+          deleteMany: {
+            userId: id,
+          },
+        },
+        Post: {
+          deleteMany: {
+            userId: id,
+          },
+        },
+      },
     });
-    return `delete user ${id}`;
+
+    return 'deleted';
   }
 }

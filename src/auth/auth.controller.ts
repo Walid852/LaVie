@@ -42,19 +42,19 @@ export class AuthController {
   @Post('signin')
   @ApiAcceptedResponse({
     description: 'successfully LOgin in .',
-    type: DataResponseSignIn,
+    type: DataResponse,
     isArray: true,
   })
   signin(@Body() dto: AuthDtoSignIn) {
     return this.authService.signin(dto);
   }
-  @Get('google')
+  /*@Get('google')
   @UseGuards(AuthGuard('google'))
   async googleAuth(@Req() req) {
     return HttpStatus.OK;
-  }
+  }*/
 
-  @Get('redirect')
+  @Post('google')
   @UseGuards(AuthGuard('google'))
   googleAuthRedirect(@Req() req) {
     return this.authService.googleLogin(req);
