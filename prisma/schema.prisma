@@ -42,10 +42,11 @@ model Blogs {
 }
 
 model Products {
-    id            String @id @default(uuid())
+  id            String @id @default(uuid())
   name          String
   price         Int
   superCategory String
+  photo         String?
   subCategory   String
   quantity      Int
   sunlight      Int?
@@ -129,5 +130,3 @@ model Answer {
   questionId String @id
   optionId   String @unique
 }
-
-

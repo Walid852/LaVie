@@ -20,9 +20,6 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { LikesModule } from './likes/likes.module';
 import { RepliesModule } from './replies/replies.module';
 
-
-
-
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -38,13 +35,11 @@ import { RepliesModule } from './replies/replies.module';
 
     CartModule,
 
-
     BlogsModule,
     PostsModule,
     NotificationsModule,
     LikesModule,
     RepliesModule,
-
   ],
   providers: [PrismaService, QuizService],
   controllers: [QuizController],
