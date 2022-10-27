@@ -14,8 +14,10 @@ import {
   ApiAcceptedResponse,
   ApiCreatedResponse,
   ApiOkResponse,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
+import { Role } from 'src/enums/role.enum';
 import { AuthService } from './auth.service';
 import {
   AuthDto,
@@ -56,6 +58,11 @@ export class AuthController {
 
   @Post('google')
   @UseGuards(AuthGuard('google'))
+  @ApiCreatedResponse({
+    description: 'successfully Authanticate with google.',
+    type: DataResponse,
+    isArray: true,
+  })
   googleAuthRedirect(@Req() req) {
     return this.authService.googleLogin(req);
   }

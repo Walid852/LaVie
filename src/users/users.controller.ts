@@ -34,7 +34,6 @@ import {
   ApiConsumes,
   ApiTags,
 } from '@nestjs/swagger';
-import { Userentity } from './entities/user.entity';
 
 export const storage = {
   storage: diskStorage({
@@ -61,14 +60,13 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }*/
 
+  @UseGuards(JwtGuard)
   @Get()
-  @UseGuards(JwtGuard, RolesGuard)
   @ApiAcceptedResponse({
     description: 'Find all users',
     type: CreateUserDto,
     isArray: true,
   })
-  //@Roles(Role.User)
   findAll(@Request() req) {
     const user: User = req.user;
     console.log(user);
@@ -81,14 +79,15 @@ export class UsersController {
   })
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.usersService.findOne(id);
+    const user = this.usersService.findOne(id);
+    if (!user) throw new BadRequestException('wrong id');
+    return user;
   }
 
   @Patch()
   @ApiAcceptedResponse({
     description: 'Update current user',
     type: UpdateUserDto,
-    isArray: true,
   })
   update(@Body() updateUserDto: UpdateUserDto, @Request() req) {
     const user: User = req.user;
@@ -122,6 +121,10 @@ export class UsersController {
   })
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.usersService.remove(id);
+    try {
+      return this.usersService.remove(id);
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
   }
 }
