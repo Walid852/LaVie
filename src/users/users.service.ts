@@ -154,11 +154,12 @@ export class UsersService {
         },
       });
       console.log(2);
+      fot()
       await this.prisma.reply.deleteMany({
         where: {
           userID: id,
         },
-      });
+      });}
       console.log(3);
 
       await this.prisma.post.deleteMany({

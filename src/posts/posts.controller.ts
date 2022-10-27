@@ -76,6 +76,11 @@ export class PostsController {
   }
 
   @Get()
+  @ApiAcceptedResponse({
+    description: ' My posts',
+    type: PostResponse,
+    isArray: true,
+  })
   findAll() {
     return this.postsService.findAll();
   }
@@ -83,6 +88,7 @@ export class PostsController {
   @ApiAcceptedResponse({
     description: ' My posts',
     type: PostResponse,
+    isArray: true,
   })
   Myposts(@Request() req) {
     const user = req.user;
@@ -97,7 +103,6 @@ export class PostsController {
   @ApiAcceptedResponse({
     description: ' single Post',
     type: PostResponse,
-    isArray: true,
   })
   findOne(@Param('id') id: string) {
     return this.postsService.findOne(id);

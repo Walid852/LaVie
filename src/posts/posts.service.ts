@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateNotificationDto } from 'src/notifications/dto/create-notification.dto';
 import { NotificationsService } from 'src/notifications/notifications.service';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -36,12 +36,19 @@ export class PostsService {
     return posts;
   }
   async myPosts(id: string) {
+    const user = this.prisma.user.findUnique({
+      where: {
+        id: id,
+      },
+    });
+    if (!user) {
+      throw new BadRequestException('no user');
+    }
     const posts = await this.prisma.post.findMany({
       where: {
         userId: id,
       },
     });
-    console.log(posts);
     return posts;
   }
 

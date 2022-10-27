@@ -56,7 +56,6 @@ export class BlogsController {
   @ApiAcceptedResponse({
     description: ' create Blog successfully',
     type: BlogResponse,
-    isArray: true,
   })
   create(
     @Body() createBlogDto: CreateBlogDto,
@@ -77,6 +76,7 @@ export class BlogsController {
   @ApiAcceptedResponse({
     description: ' All Blogs',
     type: BlogResponse,
+    isArray: true,
   })
   findAll() {
     return this.blogsService.findAll();
@@ -85,6 +85,7 @@ export class BlogsController {
   @ApiAcceptedResponse({
     description: ' My Blogs',
     type: BlogResponse,
+    isArray: true,
   })
   MyBlogs(@Request() req) {
     const user: User = req.user;
