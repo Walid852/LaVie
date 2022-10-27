@@ -10,6 +10,8 @@ import * as argon from 'argon2';
 
 import { JwtService } from '@nestjs/jwt';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { v4 as uuidv4 } from 'uuid';
+import console from 'console';
 
 @Injectable()
 export class AuthService {
@@ -43,7 +45,6 @@ export class AuthService {
           createdAt: true,
         },
       });
-      console.log(user);
       const res: DataResponse = {
         accessToken: (await this.signToken(user.id, user.email)).access_token,
         user: user,
@@ -65,10 +66,15 @@ export class AuthService {
       },
     });
     if (!user) throw new ForbiddenException('Credentials incorrect');
-    console.log('signin');
     const pwMatches = await argon.verify(user.Password, dto.password);
     if (!pwMatches) throw new ForbiddenException('Credentials incorrect');
-    return this.signToken(user.id, user.email);
+
+    delete user.Password;
+    const res: DataResponse = {
+      accessToken: (await this.signToken(user.id, user.email)).access_token,
+      user: user,
+    };
+    return res;
   }
   async signToken(
     userId: string,
@@ -89,14 +95,31 @@ export class AuthService {
       access_token: token,
     };
   }
-  googleLogin(req) {
+  async googleLogin(req) {
     if (!req.user) {
       return 'No user from google';
+    } else {
+      const user = req.user._json;
+      const temp = await this.prisma.user.findUnique({
+        where: {
+          email: user.email,
+        },
+      });
+      if (temp) {
+        return this.signToken(temp.id, temp.email);
+      } else {
+        const userSignUp: AuthDto = {
+          firstName: user.given_name,
+          lastName: user.family_name,
+          email: user.email,
+          password: uuidv4(),
+        };
+        return this.signup(userSignUp);
+      }
+      /*return {
+        message: 'User information from google',
+        user: req.user,
+      };*/
     }
-
-    return {
-      message: 'User information from google',
-      user: req.user,
-    };
   }
 }

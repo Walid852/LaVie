@@ -24,8 +24,6 @@ export class AuthDto {
     example: 'Ahmed',
   })
   lastName: string;
-  @IsString()
-  role: string;
 }
 export class AuthDtoSignIn {
   @IsEmail()
@@ -41,14 +39,32 @@ export class AuthDtoSignIn {
   })
   password: string;
 }
-
+export class tempUser {
+  @ApiProperty()
+  id: string;
+  @ApiProperty()
+  email: string;
+  @ApiProperty()
+  firstName: string;
+  @ApiProperty()
+  lastName: string;
+  @ApiProperty()
+  points: string;
+  @ApiProperty()
+  profilePic: string;
+  @ApiProperty()
+  address: string;
+  @ApiProperty()
+  createdAt: string;
+}
 export class DataResponse {
   @ApiProperty()
   accessToken: string;
 
-  @ApiProperty({ type: AuthDto })
+  @ApiProperty({ type: tempUser })
   user;
 }
+
 export class DataResponseSignIn {
   @ApiProperty()
   accessToken: string;
