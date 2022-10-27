@@ -83,6 +83,6 @@ export class QuizService {
       const randomedOptions = random_options(options);
       quiz.push({ quest, randomedOptions });
     }
-    return { quiz };
+    return { quizz: quiz };
   }
 }
